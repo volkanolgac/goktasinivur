@@ -258,9 +258,11 @@ class SpeechManagerService {
     const clean = word.trim();
     const lower = clean.toLocaleLowerCase('tr-TR');
 
-    // 1. Fix 'na' being pronounced as 'nea' or 'N/A' in browser speech synthesis
+    // 1. Fix 'na' pronunciation:
+    // 'Naa.' forces speech engines to pronounce a pure, open, unpalatalized Turkish syllable 'na'.
+    // Circumflex 'nâ' was palatalizing the vowel into 'ne', so standard 'Naa.' is strictly used!
     if (lower === 'na') {
-      return 'nâ.';
+      return 'Naa.';
     }
 
     // 2. Clear short syllables with period to force full vowel enunciation
