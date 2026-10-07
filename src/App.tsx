@@ -115,7 +115,7 @@ export default function App() {
   };
 
   return (
-    <main className="relative w-screen h-screen overflow-hidden bg-slate-950 text-white font-['Fredoka','Nunito',sans-serif]">
+    <main className="relative w-screen h-screen overflow-hidden bg-slate-950 text-white font-['Nunito',sans-serif]">
       {/* Dynamic Cosmic Space Environment Background */}
       <SpaceBackground />
 

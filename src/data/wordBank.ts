@@ -16,7 +16,6 @@ export const WORD_BANK: WordItem[] = [
   { id: 'w_an_4', word: 'ana', difficulty: 'easy', category: 'kelime' },
   { id: 'w_an_5', word: 'nan', difficulty: 'easy', category: 'hece' },
   { id: 'w_an_6', word: 'nana', difficulty: 'easy', category: 'kelime' },
-  { id: 'w_an_7', word: 'anan', difficulty: 'easy', category: 'kelime' },
 
   // --- 2. + E Basamağı (A, N, E) ---
   { id: 'w_ane_1', word: 'en', difficulty: 'easy', category: 'kelime' },

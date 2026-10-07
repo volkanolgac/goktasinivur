@@ -51,7 +51,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ onComplete }
           <div
             key={step}
             className="text-8xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-amber-400 to-orange-500 drop-shadow-[0_10px_25px_rgba(251,191,36,0.6)] animate-[countdownScale_0.75s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-            style={{ fontFamily: "'Fredoka', 'Nunito', sans-serif" }}
+            style={{ fontFamily: "'Nunito', sans-serif" }}
           >
             {step}
           </div>
@@ -59,7 +59,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ onComplete }
           <div
             key="go"
             className="text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-400 drop-shadow-[0_10px_35px_rgba(52,211,153,0.8)] animate-[countdownScale_0.75s_cubic-bezier(0.16,1,0.3,1)_forwards]"
-            style={{ fontFamily: "'Fredoka', 'Nunito', sans-serif" }}
+            style={{ fontFamily: "'Nunito', sans-serif" }}
           >
             BAŞLA!
           </div>

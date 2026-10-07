@@ -142,14 +142,20 @@ export const Asteroid: React.FC<AsteroidProps> = ({
         />
 
         {/* The Turkish Word Badge */}
-        <div className="relative z-10 px-3 py-1 flex items-center justify-center">
+        <div className="relative z-10 px-2 py-0.5 flex items-center justify-center max-w-[90%] overflow-hidden">
           <span
-            className="text-white font-extrabold tracking-wide drop-shadow-md text-center break-keep"
+            className="text-white font-black tracking-wide drop-shadow-md text-center break-keep select-none truncate"
             style={{
-              fontSize: data.word.length > 7 ? '1.15rem' : data.word.length > 5 ? '1.35rem' : '1.65rem',
+              fontSize: (() => {
+                const scale = (data.size || 115) / 115;
+                if (data.word.length > 6) return `${Math.max(0.75, 1.1 * scale).toFixed(2)}rem`;
+                if (data.word.length > 4) return `${Math.max(0.85, 1.3 * scale).toFixed(2)}rem`;
+                if (data.word.length > 2) return `${Math.max(0.95, 1.55 * scale).toFixed(2)}rem`;
+                return `${Math.max(1.05, 1.75 * scale).toFixed(2)}rem`;
+              })(),
               lineHeight: 1.1,
               textShadow: currentTheme.textShadow,
-              fontFamily: "'Fredoka', 'Nunito', sans-serif",
+              fontFamily: "'Nunito', sans-serif",
             }}
           >
             {data.word}

@@ -94,7 +94,7 @@ export const LetterSettingsModal: React.FC<LetterSettingsModalProps> = ({
         key={item.id}
         type="button"
         onClick={() => toggleLetter(item.upper)}
-        className={`h-11 sm:h-12 flex-1 min-w-[48px] sm:min-w-[62px] rounded-2xl font-black text-sm sm:text-base transition-all duration-150 cursor-pointer shadow-sm select-none ${
+        className={`h-9 xs:h-10 sm:h-12 flex-1 min-w-0 rounded-xl sm:rounded-2xl font-black text-xs xs:text-sm sm:text-base transition-all duration-150 cursor-pointer shadow-sm select-none ${
           isSelected
             ? 'bg-amber-500 hover:bg-amber-400 text-white shadow-[0_4px_12px_rgba(245,158,11,0.5)] scale-[1.03] ring-2 ring-amber-300'
             : 'bg-slate-300/80 hover:bg-slate-200 text-slate-700'
@@ -106,9 +106,9 @@ export const LetterSettingsModal: React.FC<LetterSettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-md select-none overflow-y-auto pointer-events-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 bg-slate-950/75 backdrop-blur-md select-none overflow-y-auto pointer-events-auto">
       {/* Modal card styled matching image.png */}
-      <div className="relative w-full max-w-2xl my-auto p-6 sm:p-8 rounded-[36px] bg-slate-100 text-slate-800 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex flex-col border border-slate-200">
+      <div className="relative w-full max-w-2xl my-auto p-4 sm:p-8 rounded-3xl sm:rounded-[36px] bg-slate-100 text-slate-800 shadow-[0_20px_60px_rgba(0,0,0,0.6)] flex flex-col border border-slate-200">
         {/* Close Button Top-Right (as in image.png) */}
         <button
           type="button"
@@ -116,36 +116,35 @@ export const LetterSettingsModal: React.FC<LetterSettingsModalProps> = ({
             AudioManager.playClick();
             onClose();
           }}
-          className="absolute top-5 right-5 w-10 h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
           aria-label="Kapat"
         >
-          <svg className="w-6 h-6 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
         {/* Title */}
-        <div className="text-center mb-5">
-          <h2 className="text-2xl sm:text-3xl font-black text-indigo-950 tracking-tight">
+        <div className="text-center mb-3 sm:mb-5 pr-8 pl-8 sm:pr-0 sm:pl-0">
+          <h2 className="text-xl sm:text-3xl font-black text-indigo-950 tracking-tight">
             Harfleri Seçin
           </h2>
-          <div className="mt-1 flex items-center justify-center gap-2 text-xs sm:text-sm font-bold text-slate-500">
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+          <div className="mt-1 flex items-center justify-center gap-2 text-[11px] sm:text-sm font-bold text-slate-500 flex-wrap">
+            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
               ★ 'A' harfi temel ses olarak sabit etkindir
             </span>
-            <span>•</span>
             <span className="text-emerald-700 font-extrabold">{totalFilteredWords} uygun kelime</span>
           </div>
         </div>
 
         {/* Button Rows matching image.png */}
-        <div className="space-y-2.5 sm:space-y-3 my-2">
+        <div className="space-y-1.5 sm:space-y-2.5 my-2">
           {/* Row 1: [Hepsi] + [Nn] [Ee] [Tt] [İi] [Ll] */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             <button
               type="button"
               onClick={toggleAll}
-              className={`h-11 sm:h-12 flex-1 min-w-[58px] sm:min-w-[76px] rounded-2xl font-black text-xs sm:text-sm transition-all duration-150 cursor-pointer shadow-sm select-none ${
+              className={`h-9 xs:h-10 sm:h-12 flex-1 min-w-0 rounded-xl sm:rounded-2xl font-black text-xs xs:text-sm sm:text-sm transition-all duration-150 cursor-pointer shadow-sm select-none ${
                 config.allLettersEnabled
                   ? 'bg-amber-500 hover:bg-amber-400 text-white shadow-[0_4px_12px_rgba(245,158,11,0.5)] scale-[1.03] ring-2 ring-amber-300'
                   : 'bg-slate-300/80 hover:bg-slate-200 text-slate-700'
@@ -157,22 +156,22 @@ export const LetterSettingsModal: React.FC<LetterSettingsModalProps> = ({
           </div>
 
           {/* Row 2: [Oo] [Kk] [Uu] [Rr] [Iı] [Mm] */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {row2Letters.map(renderLetterButton)}
           </div>
 
           {/* Row 3: [Üü] [Ss] [Öö] [Yy] [Dd] [Zz] */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {row3Letters.map(renderLetterButton)}
           </div>
 
           {/* Row 4: [Çç] [Bb] [Gg] [Cc] [Şş] [Pp] */}
-          <div className="flex items-center gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {row4Letters.map(renderLetterButton)}
           </div>
 
           {/* Row 5: [Hh] [Vv] [Ğğ] [Ff] [Jj] */}
-          <div className="flex items-center justify-center gap-2 sm:gap-2.5 max-w-lg mx-auto w-full">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 max-w-lg mx-auto w-full">
             {row5Letters.map(renderLetterButton)}
           </div>
         </div>

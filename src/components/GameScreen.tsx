@@ -93,6 +93,63 @@ export const GameScreen: React.FC<GameScreenProps> = ({
   // Oscillation time counter for fluid physics
   const [animTime, setAnimTime] = useState<number>(0);
 
+  // Responsive window dimensions tracking
+  const [windowDimensions, setWindowDimensions] = useState(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1024,
+    height: typeof window !== 'undefined' ? window.innerHeight : 768,
+  }));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowDimensions({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Responsive asteroid size calculation
+  const responsiveAsteroidSize = useMemo(() => {
+    const w = windowDimensions.width;
+    if (isTwoPlayer) {
+      if (w < 480) return 64;
+      if (w < 640) return 72;
+      if (w < 1024) return 88;
+      return 102;
+    }
+    // Single Player (1P)
+    if (w < 380) return 84;
+    if (w < 480) return 92;
+    if (w < 640) return 100;
+    if (w < 1024) return 114;
+    return 126;
+  }, [windowDimensions.width, isTwoPlayer]);
+
+  // Responsive spaceship size calculation
+  const responsiveSpaceshipSize = useMemo(() => {
+    const w = windowDimensions.width;
+    if (isTwoPlayer) {
+      if (w < 480) return 56;
+      if (w < 640) return 66;
+      if (w < 1024) return 76;
+      return 84;
+    }
+    if (w < 480) return 72;
+    if (w < 640) return 80;
+    if (w < 1024) return 88;
+    return 96;
+  }, [windowDimensions.width, isTwoPlayer]);
+
+  // Synchronize asteroid size on viewport change
+  useEffect(() => {
+    setAsteroidsP1(prev => prev.map(a => ({ ...a, size: responsiveAsteroidSize })));
+    if (isTwoPlayer) {
+      setAsteroidsP2(prev => prev.map(a => ({ ...a, size: responsiveAsteroidSize })));
+    }
+  }, [responsiveAsteroidSize, isTwoPlayer]);
+
   // Refs for positions
   const containerRef = useRef<HTMLDivElement>(null);
   const ship1Ref = useRef<HTMLDivElement>(null);
@@ -180,28 +237,103 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       'gem-cyan', 'gem-purple', 'gem-amber', 'gem-emerald', 'crystal-rose', 'rock'
     ];
 
-    let xRangeStart = 12;
-    let xRangeEnd = 88;
+    const w = windowDimensions.width;
+    const h = windowDimensions.height;
+    const isPortraitLayout = h > w && w < 840;
 
-    if (isTwoPlayer) {
-      if (!isRightZone) {
-        xRangeStart = 8;
-        xRangeEnd = 44;
-      } else {
-        xRangeStart = 56;
-        xRangeEnd = 92;
-      }
-    }
-
-    const stepX = (xRangeEnd - xRangeStart) / (count - 1 || 1);
     const slots: { x: number; y: number }[] = [];
-    const yPresets = [26, 18, 34, 22, 38, 20];
 
-    for (let i = 0; i < count; i++) {
-      slots.push({
-        x: xRangeStart + i * stepX + (Math.random() * 4 - 2),
-        y: yPresets[i % yPresets.length] + (Math.random() * 4 - 2),
-      });
+    if (!isTwoPlayer) {
+      // ==========================================
+      // SINGLE PLAYER (1P)
+      // ==========================================
+      if (isPortraitLayout) {
+        // TALL / PORTRAIT PHONE & TABLET: Multi-row staggered layout to avoid any horizontal collision
+        if (count === 4) {
+          const coords = [
+            { x: 28, y: 22 }, { x: 72, y: 22 },
+            { x: 28, y: 44 }, { x: 72, y: 44 },
+          ];
+          coords.forEach(c => slots.push(c));
+        } else if (count === 5) {
+          const coords = [
+            { x: 20, y: 20 }, { x: 50, y: 22 }, { x: 80, y: 20 },
+            { x: 35, y: 42 }, { x: 65, y: 42 },
+          ];
+          coords.forEach(c => slots.push(c));
+        } else {
+          // 6 asteroids
+          const coords = [
+            { x: 22, y: 19 }, { x: 50, y: 21 }, { x: 78, y: 19 },
+            { x: 22, y: 40 }, { x: 50, y: 42 }, { x: 78, y: 40 },
+          ];
+          coords.forEach(c => slots.push(c));
+        }
+      } else {
+        // WIDESCREEN / LANDSCAPE / DESKTOP: Wide arc across the screen
+        let xStart = 14;
+        let xEnd = 86;
+        if (count === 4) {
+          xStart = 18;
+          xEnd = 82;
+        } else if (count === 6) {
+          xStart = 12;
+          xEnd = 88;
+        }
+        const stepX = (xEnd - xStart) / (count - 1 || 1);
+        const yPresets = [26, 36, 22, 38, 24, 34];
+
+        for (let i = 0; i < count; i++) {
+          slots.push({
+            x: xStart + i * stepX + (Math.sin(i * 1.7) * 2),
+            y: yPresets[i % yPresets.length] + (Math.cos(i * 1.3) * 2),
+          });
+        }
+      }
+    } else {
+      // ==========================================
+      // TWO PLAYER (2P)
+      // ==========================================
+      const xRangeStart = isRightZone ? 55 : 9;
+      const xRangeEnd = isRightZone ? 91 : 45;
+      const xMid = (xRangeStart + xRangeEnd) / 2;
+
+      if (isPortraitLayout) {
+        if (count === 4) {
+          slots.push(
+            { x: isRightZone ? 64 : 18, y: 22 },
+            { x: isRightZone ? 82 : 36, y: 22 },
+            { x: isRightZone ? 64 : 18, y: 44 },
+            { x: isRightZone ? 82 : 36, y: 44 }
+          );
+        } else if (count === 5) {
+          slots.push(
+            { x: isRightZone ? 62 : 16, y: 20 },
+            { x: isRightZone ? 84 : 38, y: 20 },
+            { x: xMid, y: 33 },
+            { x: isRightZone ? 62 : 16, y: 46 },
+            { x: isRightZone ? 84 : 38, y: 46 }
+          );
+        } else {
+          slots.push(
+            { x: isRightZone ? 63 : 17, y: 19 },
+            { x: isRightZone ? 83 : 37, y: 19 },
+            { x: isRightZone ? 63 : 17, y: 34 },
+            { x: isRightZone ? 83 : 37, y: 34 },
+            { x: isRightZone ? 63 : 17, y: 49 },
+            { x: isRightZone ? 83 : 37, y: 49 }
+          );
+        }
+      } else {
+        const stepX = (xRangeEnd - xRangeStart) / (count - 1 || 1);
+        const yPresets = [26, 36, 22, 38, 24, 34];
+        for (let i = 0; i < count; i++) {
+          slots.push({
+            x: xRangeStart + i * stepX,
+            y: yPresets[i % yPresets.length],
+          });
+        }
+      }
     }
 
     return slots.map((pos, idx) => ({
@@ -210,7 +342,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       baseY: pos.y,
       theme: themes[idx % themes.length],
     }));
-  }, [isTwoPlayer]);
+  }, [isTwoPlayer, windowDimensions.width, windowDimensions.height]);
 
   // Spawn New Round
   const startNewRound = useCallback((roundNum: number) => {
@@ -256,7 +388,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         isTarget: w === targetWord,
         baseX: slot.baseX,
         baseY: slot.baseY,
-        size: isTwoPlayer ? 105 : 124,
+        size: responsiveAsteroidSize,
         speedX: 0.8 + Math.random() * 0.6,
         speedY: 0.7 + Math.random() * 0.5,
         phaseX: Math.random() * Math.PI * 2,
@@ -286,7 +418,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           isTarget: w === targetWord,
           baseX: slot.baseX,
           baseY: slot.baseY,
-          size: 105,
+          size: responsiveAsteroidSize,
           speedX: 0.8 + Math.random() * 0.6,
           speedY: 0.7 + Math.random() * 0.5,
           phaseX: Math.random() * Math.PI * 2,
@@ -711,7 +843,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
       )}
 
       {/* Main Asteroids Playground */}
-      <div className="relative w-full h-full pt-16 pb-24 z-10 pointer-events-auto">
+      <div className="relative w-full h-full pt-14 sm:pt-20 pb-20 sm:pb-28 z-10 pointer-events-auto">
         {/* PLAYER 1 ASTEROIDS (Single Player Full Area or Left Side in 2P) */}
         {asteroidsP1.map(ast => (
           <Asteroid
@@ -743,13 +875,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         /* Single Player Central Spaceship */
         <div
           ref={ship1Ref}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
+          className="fixed bottom-3 sm:bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
         >
           <Spaceship
             rotationAngle={ship1Angle}
             isFiring={isShip1Firing}
             colorTheme={settings.spaceshipColor || 'cyan'}
-            size={96}
+            size={responsiveSpaceshipSize}
           />
         </div>
       ) : (
@@ -757,27 +889,27 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         <>
           <div
             ref={ship1Ref}
-            className="fixed bottom-6 left-1/4 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
+            className="fixed bottom-3 sm:bottom-6 left-1/4 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
           >
             <div className="text-[10px] font-black text-cyan-300 -mb-1 drop-shadow">1. OYUNCU</div>
             <Spaceship
               rotationAngle={ship1Angle}
               isFiring={isShip1Firing}
               colorTheme={settings.spaceshipColor || 'cyan'}
-              size={84}
+              size={responsiveSpaceshipSize}
             />
           </div>
 
           <div
             ref={ship2Ref}
-            className="fixed bottom-6 left-3/4 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
+            className="fixed bottom-3 sm:bottom-6 left-3/4 -translate-x-1/2 z-20 pointer-events-none flex flex-col items-center"
           >
             <div className="text-[10px] font-black text-orange-300 -mb-1 drop-shadow">2. OYUNCU</div>
             <Spaceship
               rotationAngle={ship2Angle}
               isFiring={isShip2Firing}
               colorTheme={settings.spaceshipColor === 'orange' ? 'cyan' : 'orange'}
-              size={84}
+              size={responsiveSpaceshipSize}
             />
           </div>
         </>
@@ -812,12 +944,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
       {/* Game Over / Canlar Bitti Modal */}
       {isGameOver && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md select-none pointer-events-auto">
-          <div className="relative w-full max-w-md p-6 sm:p-8 rounded-[36px] bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 border-2 border-rose-500/60 shadow-[0_0_60px_rgba(244,63,94,0.4)] flex flex-col items-center text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md select-none pointer-events-auto overflow-y-auto">
+          <div className="relative w-full max-w-sm sm:max-w-md my-auto p-5 sm:p-8 rounded-3xl sm:rounded-[36px] bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 border-2 border-rose-500/60 shadow-[0_0_60px_rgba(244,63,94,0.4)] flex flex-col items-center text-center">
             {/* Sad broken hearts animation */}
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 mb-2 sm:mb-3">
               {[1, 2, 3].map(i => (
-                <div key={i} className="text-4xl filter grayscale opacity-40 animate-pulse">
+                <div key={i} className="text-3xl sm:text-4xl filter grayscale opacity-40 animate-pulse">
                   💔
                 </div>
               ))}
@@ -826,19 +958,19 @@ export const GameScreen: React.FC<GameScreenProps> = ({
             <h3 className="text-2xl sm:text-3xl font-black text-rose-300 drop-shadow">
               Canların Bitti!
             </h3>
-            <p className="mt-2 text-slate-300 text-sm sm:text-base font-semibold leading-relaxed">
+            <p className="mt-1.5 sm:mt-2 text-slate-300 text-xs sm:text-base font-semibold leading-relaxed">
               Üzülme! Çok güzel gayret gösterdin. Tekrar deneyerek hedefine ulaşabilirsin!
             </p>
 
-            <div className="mt-4 px-4 py-2 rounded-2xl bg-slate-800/80 border border-slate-700 text-sm font-bold text-amber-300">
-              Kazanılan Puan: <span className="font-black text-white text-base">{player1.score}</span>
+            <div className="mt-3 sm:mt-4 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs sm:text-sm font-bold text-amber-300">
+              Kazanılan Puan: <span className="font-black text-white text-sm sm:text-base">{player1.score}</span>
             </div>
 
-            <div className="mt-6 flex items-center gap-3 w-full">
+            <div className="mt-5 sm:mt-6 flex items-center gap-2.5 sm:gap-3 w-full">
               <button
                 type="button"
                 onClick={handleRestartAfterGameOver}
-                className="flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-base shadow-[0_0_20px_rgba(245,158,11,0.5)] transition-transform active:scale-95 cursor-pointer"
+                className="flex-1 py-3 sm:py-3.5 px-4 sm:px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-sm sm:text-base shadow-[0_0_20px_rgba(245,158,11,0.5)] transition-transform active:scale-95 cursor-pointer"
               >
                 Tekrar Dene
               </button>
@@ -846,7 +978,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
               <button
                 type="button"
                 onClick={onBackToMenu}
-                className="py-3.5 px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition-transform active:scale-95 cursor-pointer"
+                className="py-3 sm:py-3.5 px-4 sm:px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs sm:text-sm border border-slate-700 transition-transform active:scale-95 cursor-pointer"
               >
                 Ana Menü
               </button>

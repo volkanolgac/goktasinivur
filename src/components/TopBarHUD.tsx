@@ -23,13 +23,13 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
   onOpenSettings,
 }) => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-20 h-16 sm:h-20 px-3 sm:px-6 flex items-center justify-between select-none bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-transparent pointer-events-auto">
+    <header className="fixed top-0 left-0 right-0 z-20 h-14 sm:h-20 px-2 sm:px-6 flex items-center justify-between select-none bg-gradient-to-b from-slate-950/90 via-slate-950/40 to-transparent pointer-events-auto gap-1 sm:gap-2">
       {/* TOP LEFT: Back & Settings */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
           type="button"
           onClick={onBackToMenu}
-          className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 shadow-md text-slate-200 hover:text-white text-xs sm:text-sm font-bold transition-transform active:scale-95 cursor-pointer"
+          className="flex items-center gap-1 px-2 py-1 sm:px-4 sm:py-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 shadow-md text-slate-200 hover:text-white text-xs sm:text-sm font-bold transition-transform active:scale-95 cursor-pointer"
           title="Ana Menüye Dön"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +41,7 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
         <button
           type="button"
           onClick={onOpenSettings}
-          className="p-1.5 sm:p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 shadow-md text-slate-200 hover:text-white transition-transform active:scale-95 cursor-pointer"
+          className="p-1 sm:p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 shadow-md text-slate-200 hover:text-white transition-transform active:scale-95 cursor-pointer"
           title="Ayarlar"
         >
           <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,17 +52,17 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
       </div>
 
       {/* TOP CENTER: Spoken-word status indicator */}
-      <div className="flex items-center">
+      <div className="flex items-center mx-auto">
         <div
-          className={`flex items-center gap-2 px-3 py-1.5 sm:px-5 sm:py-2 rounded-2xl border transition-all duration-300 shadow-lg ${
+          className={`flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-5 sm:py-2 rounded-2xl border transition-all duration-300 shadow-lg ${
             isSpeaking
               ? 'bg-gradient-to-r from-amber-500/25 via-yellow-500/30 to-amber-500/25 border-yellow-400/80 shadow-[0_0_20px_rgba(250,204,21,0.4)]'
               : 'bg-slate-900/80 border-slate-700/80'
           }`}
         >
           {/* Custom Animated Sound Waves Vector Icon */}
-          <div className="relative flex items-center justify-center w-5 h-5 text-yellow-300">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <div className="relative flex items-center justify-center w-4 h-4 sm:w-5 sm:h-5 text-yellow-300 shrink-0">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M11 5L6 9H2v6h4l5 4V5z" />
             </svg>
             {isSpeaking && (
@@ -71,7 +71,7 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
           </div>
 
           <span
-            className={`font-black text-xs sm:text-base tracking-wide transition-colors ${
+            className={`font-black text-[11px] sm:text-base tracking-wide transition-colors truncate max-w-[110px] xs:max-w-none ${
               isSpeaking ? 'text-yellow-200' : 'text-slate-200'
             }`}
           >
@@ -81,24 +81,24 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
       </div>
 
       {/* TOP RIGHT: Game Stats (Round, Score, Lives, Combo) */}
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-1 sm:gap-3 shrink-0">
         {/* Round Counter */}
-        <div className="flex flex-col items-center px-2 sm:px-3 py-0.5 rounded-xl bg-slate-900/80 border border-slate-800">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tur</span>
-          <span className="text-xs sm:text-sm font-black text-cyan-300 tabular-nums">
-            {currentRound} / {totalRounds}
+        <div className="flex flex-col items-center px-1.5 sm:px-3 py-0.5 rounded-xl bg-slate-900/80 border border-slate-800">
+          <span className="text-[9px] sm:text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tur</span>
+          <span className="text-[11px] sm:text-sm font-black text-cyan-300 tabular-nums">
+            {currentRound}/{totalRounds}
           </span>
         </div>
 
         {/* Lives (3 Soft Hearts) */}
         {!isTwoPlayer && (
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-800" title="Kalan Canlar">
+          <div className="flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-xl bg-slate-900/80 border border-slate-800" title="Kalan Canlar">
             {[1, 2, 3].map(heartIdx => {
               const isAlive = heartIdx <= player1.lives;
               return (
                 <svg
                   key={heartIdx}
-                  className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300 ${
+                  className={`w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-6 sm:h-6 transition-all duration-300 ${
                     isAlive
                       ? 'text-rose-500 fill-rose-500 scale-100 drop-shadow-[0_0_8px_rgba(244,63,94,0.7)] animate-pulse'
                       : 'text-slate-600 fill-slate-800 scale-75 opacity-30 grayscale'
@@ -113,19 +113,19 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
         )}
 
         {/* Player 1 Score & Combo */}
-        <div className="flex items-center gap-2">
-          <div className="flex flex-col items-end px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-xl bg-cyan-950/60 border border-cyan-800/60 shadow-sm">
-            <span className="text-[10px] text-cyan-300 font-bold">
-              {isTwoPlayer ? '1. Oyuncu' : 'Puan'}
+        <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex flex-col items-end px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-xl bg-cyan-950/60 border border-cyan-800/60 shadow-sm">
+            <span className="text-[9px] sm:text-[10px] text-cyan-300 font-bold">
+              {isTwoPlayer ? '1.P' : 'Puan'}
             </span>
-            <span className="text-sm sm:text-lg font-black text-yellow-300 tabular-nums">
+            <span className="text-xs sm:text-base md:text-lg font-black text-yellow-300 tabular-nums">
               {player1.score}
             </span>
           </div>
 
           {/* Combo badge if > 1 */}
           {player1.combo > 1 && (
-            <div className="animate-bounce px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-[11px] sm:text-xs shadow-md">
+            <div className="animate-bounce px-1 sm:px-2 py-0.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-[10px] sm:text-xs shadow-md">
               {player1.combo}x
             </div>
           )}
@@ -133,15 +133,15 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
 
         {/* Player 2 Stats in 2P Mode */}
         {isTwoPlayer && player2 && (
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col items-end px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-xl bg-orange-950/60 border border-orange-800/60 shadow-sm">
-              <span className="text-[10px] text-orange-300 font-bold">2. Oyuncu</span>
-              <span className="text-sm sm:text-lg font-black text-amber-300 tabular-nums">
+          <div className="flex items-center gap-1 sm:gap-2">
+            <div className="flex flex-col items-end px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-xl bg-orange-950/60 border border-orange-800/60 shadow-sm">
+              <span className="text-[9px] sm:text-[10px] text-orange-300 font-bold">2.P</span>
+              <span className="text-xs sm:text-base md:text-lg font-black text-amber-300 tabular-nums">
                 {player2.score}
               </span>
             </div>
             {player2.combo > 1 && (
-              <div className="animate-bounce px-2 py-0.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black text-[11px] sm:text-xs shadow-md">
+              <div className="animate-bounce px-1 sm:px-2 py-0.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 text-slate-950 font-black text-[10px] sm:text-xs shadow-md">
                 {player2.combo}x
               </div>
             )}
