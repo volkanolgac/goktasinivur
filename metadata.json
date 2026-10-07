@@ -1,0 +1,6 @@
+{
+  "name": "Gök Taşını Vur",
+  "description": "1. sınıf öğrencileri için eğlenceli ve öğretici Türkçe okuma ve sesli gök taşı vurma oyunu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
