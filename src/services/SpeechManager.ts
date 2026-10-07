@@ -25,9 +25,9 @@ class SpeechManagerService {
   private listeners: Set<SpeechListener> = new Set();
   private onDuckingCallback: ((duck: boolean) => void) | null = null;
 
-  // Settings
-  public rate = 0.90;
-  public pitch = 1.22;
+  // Settings for high-clarity first-grade phonics
+  public rate = 0.80; // Slower, highly enunciated so letters are not swallowed
+  public pitch = 1.08; // Natural, full vocal resonance
   public volume = 1.0;
   public isMuted = false;
 
@@ -181,9 +181,9 @@ class SpeechManagerService {
         });
         this.selectedVoice = female || trVoices[0] || null;
       }
-      // Gentle, clear female pitch shaping
-      this.pitch = 1.24;
-      this.rate = 0.90;
+      // Gentle, clear female pitch shaping for children's learning
+      this.pitch = 1.08;
+      this.rate = 0.78;
       return;
     }
 
@@ -196,25 +196,25 @@ class SpeechManagerService {
         const male = trVoices.find(v => v.name.toLowerCase().includes('ahmet') || v.name.toLowerCase().includes('male'));
         this.selectedVoice = male || trVoices[0] || null;
       }
-      // Natural male pitch shaping
-      this.pitch = 0.98;
-      this.rate = 0.94;
+      // Natural clear male pitch shaping
+      this.pitch = 0.96;
+      this.rate = 0.82;
       return;
     }
 
     if (voiceURI === 'preset:microsoft-filiz') {
       const filiz = trVoices.find(v => v.name.toLowerCase().includes('filiz'));
       this.selectedVoice = filiz || trVoices.find(v => v.name.toLowerCase().includes('emel')) || trVoices[0] || null;
-      this.pitch = 1.20;
-      this.rate = 0.90;
+      this.pitch = 1.08;
+      this.rate = 0.78;
       return;
     }
 
     if (voiceURI === 'preset:google-turkce') {
       const google = trVoices.find(v => v.name.toLowerCase().includes('google'));
       this.selectedVoice = google || trVoices[0] || null;
-      this.pitch = 1.15;
-      this.rate = 0.90;
+      this.pitch = 1.06;
+      this.rate = 0.80;
       return;
     }
 
@@ -223,8 +223,8 @@ class SpeechManagerService {
     if (directMatch) {
       this.selectedVoice = directMatch;
       const isMale = directMatch.name.toLowerCase().includes('tolga') || directMatch.name.toLowerCase().includes('male');
-      this.pitch = isMale ? 0.98 : 1.22;
-      this.rate = 0.90;
+      this.pitch = isMale ? 0.96 : 1.08;
+      this.rate = 0.80;
     } else {
       // Default to female Turkish
       this.applyVoicePreset('preset:microsoft-emel');
@@ -251,7 +251,28 @@ class SpeechManagerService {
   }
 
   /**
-   * Speaks a Turkish word clearly
+   * Prepares text for optimal Turkish phonetic clarity,
+   * preventing browser speech engines from swallowing letters or misreading short syllables.
+   */
+  private formatForClearEnunciation(word: string): string {
+    const clean = word.trim();
+    const lower = clean.toLocaleLowerCase('tr-TR');
+
+    // 1. Fix 'na' being pronounced as 'nea' or 'N/A' in browser speech synthesis
+    if (lower === 'na') {
+      return 'nâ.';
+    }
+
+    // 2. Clear short syllables with period to force full vowel enunciation
+    if (clean.length <= 3 && !clean.endsWith('.')) {
+      return `${clean.charAt(0).toLocaleUpperCase('tr-TR')}${clean.slice(1)}.`;
+    }
+
+    return clean;
+  }
+
+  /**
+   * Speaks a Turkish word clearly with emphatic volume and enunciation
    */
   public speakWord(word: string, onEnd?: () => void): void {
     if (!this.synth || this.isMuted) {
@@ -261,11 +282,12 @@ class SpeechManagerService {
 
     this.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(word);
+    const formatted = this.formatForClearEnunciation(word);
+    const utterance = new SpeechSynthesisUtterance(formatted);
     utterance.lang = 'tr-TR';
     utterance.rate = this.rate;
     utterance.pitch = this.pitch;
-    utterance.volume = this.volume;
+    utterance.volume = 1.0; // Maximum volume for high clarity
 
     if (this.selectedVoice) {
       utterance.voice = this.selectedVoice;

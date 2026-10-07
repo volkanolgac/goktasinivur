@@ -74,6 +74,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({
 
   // Round locks & timing
   const [isRoundLocked, setIsRoundLocked] = useState<boolean>(false);
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isSpeaking, setIsSpeaking] = useState<boolean>(false);
   const roundStartTimeRef = useRef<number>(Date.now());
   const recentWordsRef = useRef<string[]>([]);
@@ -352,6 +353,31 @@ export const GameScreen: React.FC<GameScreenProps> = ({
     }, 1100);
   };
 
+  const handleRestartAfterGameOver = () => {
+    AudioManager.playClick();
+    setIsGameOver(false);
+    setIsRoundLocked(false);
+    setPlayer1(prev => ({
+      ...prev,
+      lives: 3,
+      combo: 0,
+      score: 0,
+      correctAnswers: 0,
+      totalAttempts: 0,
+    }));
+    setPlayer2(prev => ({
+      ...prev,
+      lives: 3,
+      combo: 0,
+      score: 0,
+      correctAnswers: 0,
+      totalAttempts: 0,
+    }));
+    setCurrentRound(1);
+    startNewRound(1);
+    SpeechManager.speakWord("Haydi tekrar deneyelim!");
+  };
+
   // Asteroid Selection Handler (Core Gameplay Sequence)
   const handleAsteroidClick = (
     asteroid: AsteroidData,
@@ -438,20 +464,27 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         }, 600);
       }
 
-      // Update player attempts
+      // Update player attempts and decrement lives
+      let remainingLives = 3;
       if (isP1) {
+        remainingLives = Math.max(0, player1.lives - 1);
         setPlayer1(prev => ({
           ...prev,
           totalAttempts: prev.totalAttempts + 1,
           combo: 0,
+          lives: remainingLives,
         }));
       } else {
+        remainingLives = Math.max(0, player2.lives - 1);
         setPlayer2(prev => ({
           ...prev,
           totalAttempts: prev.totalAttempts + 1,
           combo: 0,
+          lives: remainingLives,
         }));
       }
+
+      AudioManager.playHeartLost();
 
       // Projectile animation loop (flies past and out into space)
       const travelDuration = 360; // ms
@@ -471,6 +504,16 @@ export const GameScreen: React.FC<GameScreenProps> = ({
           setIsShip1Firing(false);
           setIsShip2Firing(false);
           AudioManager.playMiss();
+
+          if (remainingLives === 0) {
+            // ALL 3 HEARTS LOST: Trigger Game Over
+            setTimeout(() => {
+              AudioManager.playGameOver();
+              SpeechManager.speakWord("Canların bitti! Tekrar deneyelim.");
+              setIsGameOver(true);
+            }, 350);
+            return;
+          }
 
           // Supportive voice & repeat target word
           SpeechManager.speakIncorrectSupport(() => {
@@ -766,6 +809,51 @@ export const GameScreen: React.FC<GameScreenProps> = ({
         player1={player1}
         currentRound={currentRound}
       />
+
+      {/* Game Over / Canlar Bitti Modal */}
+      {isGameOver && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md select-none pointer-events-auto">
+          <div className="relative w-full max-w-md p-6 sm:p-8 rounded-[36px] bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 border-2 border-rose-500/60 shadow-[0_0_60px_rgba(244,63,94,0.4)] flex flex-col items-center text-center">
+            {/* Sad broken hearts animation */}
+            <div className="flex items-center gap-3 mb-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="text-4xl filter grayscale opacity-40 animate-pulse">
+                  💔
+                </div>
+              ))}
+            </div>
+
+            <h3 className="text-2xl sm:text-3xl font-black text-rose-300 drop-shadow">
+              Canların Bitti!
+            </h3>
+            <p className="mt-2 text-slate-300 text-sm sm:text-base font-semibold leading-relaxed">
+              Üzülme! Çok güzel gayret gösterdin. Tekrar deneyerek hedefine ulaşabilirsin!
+            </p>
+
+            <div className="mt-4 px-4 py-2 rounded-2xl bg-slate-800/80 border border-slate-700 text-sm font-bold text-amber-300">
+              Kazanılan Puan: <span className="font-black text-white text-base">{player1.score}</span>
+            </div>
+
+            <div className="mt-6 flex items-center gap-3 w-full">
+              <button
+                type="button"
+                onClick={handleRestartAfterGameOver}
+                className="flex-1 py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-base shadow-[0_0_20px_rgba(245,158,11,0.5)] transition-transform active:scale-95 cursor-pointer"
+              >
+                Tekrar Dene
+              </button>
+
+              <button
+                type="button"
+                onClick={onBackToMenu}
+                className="py-3.5 px-5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700 transition-transform active:scale-95 cursor-pointer"
+              >
+                Ana Menü
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -92,20 +92,23 @@ export const TopBarHUD: React.FC<TopBarHUDProps> = ({
 
         {/* Lives (3 Soft Hearts) */}
         {!isTwoPlayer && (
-          <div className="flex items-center gap-1" title="Kalan Hak">
-            {[1, 2, 3].map(heartIdx => (
-              <svg
-                key={heartIdx}
-                className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform ${
-                  heartIdx <= player1.lives
-                    ? 'text-rose-500 fill-rose-500 scale-100 drop-shadow-[0_0_6px_rgba(244,63,94,0.6)]'
-                    : 'text-slate-600 fill-slate-800 scale-90 opacity-40'
-                }`}
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            ))}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/80 border border-slate-800" title="Kalan Canlar">
+            {[1, 2, 3].map(heartIdx => {
+              const isAlive = heartIdx <= player1.lives;
+              return (
+                <svg
+                  key={heartIdx}
+                  className={`w-5 h-5 sm:w-6 sm:h-6 transition-all duration-300 ${
+                    isAlive
+                      ? 'text-rose-500 fill-rose-500 scale-100 drop-shadow-[0_0_8px_rgba(244,63,94,0.7)] animate-pulse'
+                      : 'text-slate-600 fill-slate-800 scale-75 opacity-30 grayscale'
+                  }`}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              );
+            })}
           </div>
         )}
 

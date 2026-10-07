@@ -254,6 +254,68 @@ class AudioManagerService {
     osc.stop(now + 0.42);
   }
 
+  /**
+   * Heart lost sound: Soft crack/dull thump when losing 1 life
+   */
+  public playHeartLost() {
+    if (!this.sfxEnabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(280, now);
+    osc.frequency.exponentialRampToValueAtTime(110, now + 0.28);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.3);
+  }
+
+  /**
+   * Sad game over tone: Melancholic descending minor notes when all 3 hearts are lost
+   */
+  public playGameOver() {
+    if (!this.sfxEnabled) return;
+    const ctx = this.getContext();
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    // Sad descending minor chord progression: G4 -> Eb4 -> C4 -> G3
+    const sadNotes = [
+      { f: 392.00, t: 0.0, d: 0.35 },  // G4
+      { f: 311.13, t: 0.3, d: 0.35 },  // Eb4
+      { f: 261.63, t: 0.6, d: 0.45 },  // C4
+      { f: 196.00, t: 1.0, d: 0.75 },  // G3 (low, sad resolution)
+    ];
+
+    sadNotes.forEach(({ f, t, d }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(f, now + t);
+      osc.frequency.exponentialRampToValueAtTime(f * 0.96, now + t + d);
+
+      gain.gain.setValueAtTime(0.24, now + t);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + t + d);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + t);
+      osc.stop(now + t + d);
+    });
+  }
+
   public playCombo() {
     if (!this.sfxEnabled) return;
     const ctx = this.getContext();
